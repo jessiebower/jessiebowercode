@@ -1,0 +1,267 @@
+<!-- import jquery library -->
+<!-- in future I'd like to remove dependency on this plugin to only use pure vanilla js, but for now this template requires jquery functions -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>
+  
+console.log("Bauer 1.4");
+    
+// wait for DOM to be ready before firing interscroller function defined below
+    
+    $(document).ready(function() {
+        interscrollerReady();
+    });
+    
+    
+// define interscroller function, and set a delay of 1000ms (1s) as a precautionary measure (to ensure the DOM is truly loaded and manipulatable)
+    
+    function interscrollerReady() {
+        setTimeout(function() {
+            
+            
+// get outer container div of ad slot
+// this is the div with id="mpu-1/mpu-2/inline-02+"
+            
+            var container = window.frameElement.parentNode.parentNode;
+            
+            
+// get google defined container div that wraps the iFrame on the page
+// example div on grazia: <div id="google_ads_iframe_/24156345/LWOMENS/LWLN_Grazia/home/inline-02_0__container__" .....></div>
+            
+            var frame = window.frameElement.parentNode;
+            
+          
+// get width of viewport
+
+            var w = $(window.parent.document).width();
+             
+            
+// get height of viewport
+// 3 lines for this seems overkill, but ran into some early bugs that required this. may or may not be able to shorten into single line now
+            
+            var f = window.parent.document;
+            var h;
+            h = f.documentElement.clientHeight;
+
+            
+// define new divs/text nodes for the separate pieces of the interscroller:
+// a1 = container div of interscroller
+// a2 = container div for click-through -- method is to have identically styled - and importantly, positioned - div (a2) at a higher stacking index than interscroller container (a1)
+// b = div to be used for background-image of interscroller
+// c = top black bar
+// z = "Advertisement" text node to be inserted into c
+// d = bottom black bar
+// y = "Scroll to continue with content" text node to be inserted into d
+            
+            var a1 = document.createElement("div");
+            var a2 = document.createElement("div");
+            var b = document.createElement("div");
+            var c = document.createElement("div");
+            var z = document.createTextNode("Advertisement");
+            var d = document.createElement("div");
+            var y = document.createTextNode("Scroll to continue with content");
+            
+            
+// find how many pixels the containing google frame div is from left viewport edge
+            
+            var leftOffset = $(frame).offset().left;
+            
+            
+// style the container and frame divs to set up the foundation positioning the interscroller works from (if these weren't set, the a1 code would be sizing all wrong, since the container hasn't got a height of 100vh)
+            
+            container.style.height = "100vh";
+            container.style.width = "100%";
+            container.style.position = "static";
+            frame.style.position = "absolute";
+            
+            
+//safari specific to remove positioning bug, doesn't effect other browsers
+          
+            frame.style.left = "0px";
+
+//fix transform controls on Grazia
+          
+          $(".advert").css({ 'transform' : 'none'});
+          $(".advert").css({ '-webkit-transform' : 'none'});
+          $(".jsx-4186082927").css({ 'transform' : 'none'});
+          $(".jsx-4186082927").css({ '-webkit-transform' : 'none'});
+          $(".inline-02").css({ 'transform' : 'none'});
+          $(".inline-02").css({ '-webkit-transform' : 'none'});
+          window.parent.document.querySelector('.jsx-4186082927').style.transform = undefined
+          
+            
+// set various styling for the interscroller pieces
+// worth noting:
+// ensure any css rules that require prefixed properties are set, e.g. clip-path. most are no longer required, but good to include as backwards compatibility precautions
+// clip-path is important -- this is what makes the interscroller work, as it reduces the visible 'window' of the fixed background-image to the relative positioned a1 div
+            
+// a1 = container div of interscroller
+// a2 = container div for click-through
+            
+            a1.setAttribute("id", "div-parallax-1");
+            a2.setAttribute("id", "div-parallax-2");
+            a1.style.width = w + "px";
+            a1.style.height = "100vh";
+            a1.style.margin = "10px auto 0 auto";
+            a1.style.left = "-" + leftOffset + "px";
+            a1.style.position = "absolute";
+						a1.style.transform = "none";
+            a1.style.clipPath = "inset(0px 0px 0px 0px)";
+            a1.style.webkitClipPath = "inset(0px 0px 0px 0px)";
+            a1.style.MozClipPath = "inset(0px 0px 0px 0px)";
+            a1.style.OClipPath = "inset(0px 0px 0px 0px)";
+            a1.style.pointerEvents = "none";
+            a1.style.overflow = "hidden";
+            a2.style.width = w + "px";
+            a2.style.height = "100vh";
+            a2.style.margin = "10px auto 0 auto";
+            a2.style.left = "-" + leftOffset + "px";
+            a2.style.position = "absolute";
+            a2.style.clipPath = "inset(0px 0px 0px 0px)";
+            a2.style.webkitClipPath = "inset(0px 0px 0px 0px)";
+            a2.style.MozClipPath = "inset(0px 0px 0px 0px)";
+            a2.style.OClipPath = "inset(0px 0px 0px 0px)";
+            a2.style.overflow = "hidden";
+            
+            
+// b = div to be used for background-image of interscroller
+
+            b.setAttribute("id", "parallax_img");
+            b.style.background = "url('[%ImageFile%]')";
+            b.style.height = "100vh";
+            b.style.width = "100%";
+            b.style.position = "fixed";
+            b.style.top = "0";
+            b.style.backgroundSize = "cover";
+            b.style.webkitBackgroundSize = "cover";
+            b.style.MozBackgroundSize = "cover";
+            b.style.OBackgroundSize = "cover";
+            b.style.backgroundPosition = "center";
+            b.style.backgroundRepeat = "no-repeat";
+
+            
+// c = top black bar
+            
+            c.style.display = "inline";
+            c.style.position = "absolute";
+            c.style.width = "100%";
+            c.style.height = "20px";
+            c.style.top = "0px";
+            c.style.backgroundColor = "black";
+            c.style.left = "0px";
+            c.style.color = "white";
+            c.style.lineHeight = "20px";
+            c.style.fontSize = "10px";
+            c.style.textTransform = "uppercase";
+            c.style.textAlign = "center";
+
+            
+// d = bottom black bar            
+            
+            d.style.display = "inline";
+            d.style.position = "absolute";
+            d.style.width = "100%";
+            d.style.height = "20px";
+            d.style.backgroundColor = "black";
+            d.style.bottom = "0px";
+            d.style.left = "0px";
+            d.style.color = "white";
+            d.style.lineHeight = "20px";
+            d.style.fontSize = "10px";
+            d.style.textTransform = "uppercase";
+            d.style.textAlign = "center";
+            
+            
+// grazia homepage needs specific left positioning for interscroller divs due to it's unique construction
+// code below checks if user is on grazia homepage and applies overriding css left properties to relevant divs
+
+            if (window.location.host === "graziadaily.co.uk" && window.location.pathname === "/") {
+                a1.style.left = "0px";
+                a2.style.left = "0px";
+            };
+            
+            
+// append the divs/text nodes to the DOM
+            
+            frame.insertBefore(a2, window.frameElement);
+            frame.insertBefore(a1, a2);
+            a1.append(b);
+            a1.append(c);
+            c.appendChild(z);
+            a1.append(d);
+            d.appendChild(y);
+            
+            
+// check if there is a video URL entered while trafficking. if so, repeat some of the steps above to define new divs, style and append to DOM
+// else, do nothing
+            
+            if ("[%VideoFile%]" !== "") {
+                console.log("vid uploaded! let's do it!");
+                var v = document.createElement("video");
+                var source = document.createElement("source");
+                source.setAttribute("src", "[%VideoFile%]");
+                source.setAttribute("type", "video/mp4");
+                v.setAttribute("width", "100vw");
+                v.setAttribute("height", "auto");
+                v.setAttribute("playsinline", "");
+                v.setAttribute("autoplay", "");
+                v.setAttribute("loop", "");
+                v.setAttribute("muted", "");
+                var vt = document.createTextNode("Your browser does not support the video tag.");
+                v.style.zIndex = "1";
+                v.style.height = "100vh";
+                v.style.width = "100%";
+                v.style.position = "fixed";
+                v.style.top = "0px";
+                v.style.left = "0px";
+                c.style.zIndex = "2";
+                d.style.zIndex = "2";
+                a1.insertBefore(v, b);
+                v.append(source);
+                v.append(vt);
+            } else {
+                console.log("no video");
+            };
+            
+            
+// move lb-1 to top (on compatible sites)
+            
+            $(window.parent.document).find(".ad-scroll-fix").css({
+                "position": "relative",
+                "z-index": "1"
+            });
+            
+            
+// specific css styling bug addressed by first checking if the containing div has a certain class (only present on grazia and empire)
+
+            var conTop = container.parentNode;
+            if (conTop.classList.contains("full-width-ad-container")) {
+                conTop.style.overflow = "visible";
+            };
+            
+            
+// check if parkers_dfp exists -- if it doesn't, do nothing. if it does, activate disableStickyMpus() function and add styling to handle non-full-width display on specific landing pages
+
+            if (typeof window.parent.parkers_dfp != "object") {
+                console.log("no func, let's carry on");
+            } else {
+                window.parent.parkers_dfp.disableStickyMpus();
+              $(window.parent.document).find("#valuationsLandingPage > .vehicle-lookup").css({"overflow":"inherit"});
+              $(window.parent.document).find("#carSpecsLandingPage > .car-specs-landing__content").css({"overflow":"inherit"});
+              $(window.parent.document).find("#carTaxLandingPage > .car-tax__feature-links").css({"overflow":"inherit"});
+            };
+            
+        
+//  define click-through URL variable and wrap our a2 div with this as an anchor tag
+            
+            var clickThroughURL = "%%CLICK_URL_ESC%%[%ClickthroughURL%]";
+            //$(window.parent.document).find("#div-parallax-2").wrap('<a href="' + clickThroughURL + '" target="_blank"></a>');
+          	$(frame.children[1]).wrap('<a href="' + clickThroughURL + '" target="_blank"></a>');
+        }, 1000);
+    };
+
+</script>
+
+
+<!-- add pixel tracker -->
+
+<img class="pixel-counter" src="[%PixelCounter%]" style="display: none;">
